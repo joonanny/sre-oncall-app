@@ -1,0 +1,30 @@
+# 환경변수 — 절대 커밋 금지
+.env
+.env.local
+.env.*.local
+
+# 의존성
+node_modules/
+backend/node_modules/
+
+# 로그
+*.log
+logs/
+
+# 빌드 산출물
+dist/
+build/
+
+# 데이터 / 백업
+data/
+*.sql.gz
+*.dump
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
