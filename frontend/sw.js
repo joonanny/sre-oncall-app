@@ -1,4 +1,4 @@
-const CACHE = 'msp-v1';
+const CACHE = 'msp-v2';
 const SHELL = ['/', '/index.html', '/styles.css', '/app.js', '/config.js', '/manifest.json', '/icons/icon.svg'];
 
 self.addEventListener('install', e => {
@@ -20,14 +20,17 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
 
-  // API / 웹훅은 캐시 없이 네트워크 직통
+  // 같은 오리진 GET 요청만 처리, 나머지는 브라우저에 위임
+  if (url.origin !== self.location.origin) return;
+  if (e.request.method !== 'GET') return;
   if (url.pathname.startsWith('/api') || url.pathname.startsWith('/webhook')) return;
 
   e.respondWith(
     fetch(e.request)
       .then(resp => {
-        if (resp.ok && e.request.method === 'GET') {
-          caches.open(CACHE).then(c => c.put(e.request, resp.clone()));
+        if (resp.ok) {
+          const clone = resp.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone)).catch(() => {});
         }
         return resp;
       })
