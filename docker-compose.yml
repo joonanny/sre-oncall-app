@@ -54,8 +54,7 @@ services:
       AUTHENTIK_POSTGRESQL__NAME: authentik
       AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY}
       AUTHENTIK_ERROR_REPORTING__ENABLED: "false"
-    ports:
-      - "9000:9000"
+      AUTHENTIK_WEB__LISTEN__TRUSTED_PROXY_CIDRS: "172.16.0.0/12 192.168.0.0/16"
     depends_on:
       postgres:
         condition: service_healthy
