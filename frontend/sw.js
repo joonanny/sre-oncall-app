@@ -1,4 +1,4 @@
-const CACHE = 'msp-v2';
+const CACHE = 'msp-v3';
 const SHELL = ['/', '/index.html', '/styles.css', '/app.js', '/config.js', '/manifest.json', '/icons/icon.svg'];
 
 self.addEventListener('install', e => {
@@ -20,7 +20,8 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
 
-  // 같은 오리진 GET 요청만 처리, 나머지는 브라우저에 위임
+  // 네비게이션·크로스오리진·non-GET·API는 브라우저에 위임
+  if (e.request.mode === 'navigate') return;
   if (url.origin !== self.location.origin) return;
   if (e.request.method !== 'GET') return;
   if (url.pathname.startsWith('/api') || url.pathname.startsWith('/webhook')) return;
