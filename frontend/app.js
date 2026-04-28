@@ -35,7 +35,7 @@ async function login() {
 
 async function handleCallback() {
   const code = new URLSearchParams(location.search).get('code');
-  if (!code) { navigate('login'); return; }
+  if (!code) { history.replaceState({}, '', '/'); renderLogin(); return; }
   const verifier = sessionStorage.getItem('pkce_verifier');
   sessionStorage.removeItem('pkce_verifier');
   try {
@@ -51,13 +51,14 @@ async function handleCallback() {
       }),
     });
     const data = await resp.json();
-    if (!data.access_token) throw new Error();
+    if (!data.access_token) throw new Error(data.error_description || data.error || '');
     state.token = data.access_token;
     localStorage.setItem('access_token', data.access_token);
     history.replaceState({}, '', '/');
     navigate('home');
-  } catch {
-    navigate('login');
+  } catch(e) {
+    history.replaceState({}, '', '/');
+    renderLogin(e.message);
   }
 }
 
@@ -149,7 +150,7 @@ function spinner() {
 }
 
 // ── Views ─────────────────────────────────────────────────────────────────────
-function renderLogin() {
+function renderLogin(errMsg) {
   document.getElementById('app').innerHTML = `
     <div class="login-wrap">
       <div class="login-logo">🔔</div>
@@ -157,6 +158,7 @@ function renderLogin() {
         <div class="login-title">MSP 온콜</div>
         <div class="login-sub" style="margin-top:6px">야간/주말 인프라 대응 플랫폼</div>
       </div>
+      ${errMsg ? `<div style="color:var(--danger);font-size:13px;text-align:center">${esc(errMsg)}</div>` : ''}
       <button class="btn btn-primary" style="max-width:280px" onclick="login()">Authentik으로 로그인</button>
     </div>`;
 }
